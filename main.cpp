@@ -8,6 +8,8 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 
+#include "imgui_utils.h"
+
 void lab1() {
     glBegin(GL_LINES);
 
