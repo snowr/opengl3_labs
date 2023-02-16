@@ -43,21 +43,130 @@ void lab2() {
 }
 
 void lab3() {
+    // Start the Dear ImGui frame
+    imgui_new_frame();
+    bool show_demo_window = true;
+
+    float d_t_bottom_left_s = 0.0f;
+    float d_t_bottom_left_t = 1.0f;
+
+    float d_t_bottom_right_s = 1.0f;
+    float d_t_bottom_right_t = 1.0f;
+
+    float d_t_top_left_s = 1.0f;
+    float d_t_top_left_t = 0.5f;
+
+    float d_t_top_right_s = 0.0f;
+    float d_t_top_right_t = 0.5f;
+
+    float curr_t_bottom_left_s = d_t_bottom_left_s;
+    float curr_t_bottom_left_t = d_t_bottom_left_t;
+
+    float curr_t_bottom_right_s = d_t_bottom_right_s;
+    float curr_t_bottom_right_t = d_t_bottom_right_t;
+
+    float curr_t_top_left_s = d_t_top_left_s;
+    float curr_t_top_left_t = d_t_top_left_t;
+
+    float curr_t_top_right_s = d_t_top_right_s;
+    float curr_t_top_right_t = d_t_top_right_t;
+
+
+    static bool no_menu = false;
+    ImGuiWindowFlags window_flags = 0;
+    if (!no_menu) window_flags |= ImGuiWindowFlags_MenuBar;
+
+    // Main body of the Demo window starts here.
+    if (!ImGui::Begin("Texture Coordinates Control", &show_demo_window, window_flags)) {
+        // Early out if the window is collapsed, as an optimization.
+        ImGui::End();
+        std::cout << "Imgui::End()" << std::endl;
+        return;
+    }
+
+    ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
+    // Menu Bar
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("Menu")) {
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenuBar();
+    }
+
+    ImGui::Spacing();
+    if (ImGui::CollapsingHeader("Texture Coordinates")) {
+        ImGui::Text("Values (s,t):");
+        char t_bot_left_s[64] = "";
+        sprintf(t_bot_left_s, "%.2f", curr_t_bottom_left_s);
+        ImGui::InputText("bottom left s", t_bot_left_s, 64, ImGuiInputTextFlags_CharsDecimal);
+
+        static char t_bot_left_t[64] = "";
+        sprintf(t_bot_left_t, "%.2f", curr_t_bottom_left_t);
+        ImGui::InputText("bottom left t", t_bot_left_t, 64, ImGuiInputTextFlags_CharsDecimal);
+
+        ImGui::Spacing();
+
+        static char t_bot_right_s[64] = "";
+        sprintf(t_bot_right_s, "%.2f", curr_t_bottom_right_s);
+        ImGui::InputText("bottom right s", t_bot_right_s, 64, ImGuiInputTextFlags_CharsDecimal);
+
+        static char t_bot_right_t[64] = "";
+        sprintf(t_bot_right_t, "%.2f", curr_t_bottom_right_t);
+        ImGui::InputText("bottom right t", t_bot_right_t, 64, ImGuiInputTextFlags_CharsDecimal);
+
+        ImGui::Spacing();
+
+        static char t_top_left_s[64] = "";
+        sprintf(t_top_left_s, "%.2f", curr_t_top_left_s);
+        ImGui::InputText("top left s", t_top_left_s, 64, ImGuiInputTextFlags_CharsDecimal);
+
+        static char t_top_left_t[64] = "";
+        sprintf(t_top_left_t, "%.2f", curr_t_top_left_t);
+        ImGui::InputText("top left t", t_top_left_t, 64, ImGuiInputTextFlags_CharsDecimal);
+
+        ImGui::Spacing();
+        static char t_top_right_s[64] = "";
+        sprintf(t_top_right_s, "%.2f", curr_t_top_right_s);
+        ImGui::InputText("top right s", t_top_right_s, 64, ImGuiInputTextFlags_CharsDecimal);
+
+        static char t_top_right_t[64] = "";
+        sprintf(t_top_right_t, "%.2f", curr_t_top_right_t);
+        ImGui::InputText("top right t", t_top_right_t, 64, ImGuiInputTextFlags_CharsDecimal);
+
+        curr_t_bottom_left_s = atof(t_bot_left_s);
+        curr_t_bottom_left_t = atof(t_bot_left_t);
+
+        curr_t_bottom_right_s = atof(t_bot_right_s);
+        curr_t_bottom_right_t = atof(t_bot_right_t);
+
+        curr_t_top_left_s = atof(t_top_left_s);
+        curr_t_top_left_t = atof(t_top_left_t);
+
+        curr_t_top_right_s = atof(t_top_right_s);
+        curr_t_top_right_t = atof(t_top_right_t);
+    }
+
+    ImGui::PopItemWidth();
+    ImGui::End();
+    // Rendering
+    ImGui::Render();
+
+//    glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f);
-//        glVertex3f(-1.0f,-1.0f, 1.0f);
-    glVertex3f(-.5f,-.5f, 1.0f);
+//    glTexCoord2f(0.0f, 1.0f);
+    glTexCoord2f(curr_t_bottom_left_s, curr_t_bottom_left_t);
+    glVertex3f(-.5f, -.5f, 1.0f);
 
-    glTexCoord2f(1.0f, 1.0f);
-//    glTexCoord2f(0.5, 0.5f);
-    glVertex3f( .5f,-.5f, 1.0f);
+    glTexCoord2f(curr_t_bottom_right_s, curr_t_bottom_right_t);
+    glVertex3f(.5f, -.5f, 1.0f);
 
-//    glTexCoord2f(1.0f, 0.0f);
-    glTexCoord2f(1.0f, 0.5f);
-    glVertex3f( .5f, .5f, 1.0f);
+    glTexCoord2f(curr_t_top_left_s, curr_t_top_left_t);
+    glVertex3f(.5f, .5f, 1.0f);
 
-//    glTexCoord2f(0.0f, 0.0f);
-    glTexCoord2f(0.0f, 0.5f);
+    glTexCoord2f(curr_t_top_right_s, curr_t_top_right_t);
     glVertex3f(-.5f, .5f, 1.0f);
     glEnd();
 }
@@ -91,7 +200,7 @@ int main(int argc, char** argv) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     // Create a window and OpenGL context
-    GLFWwindow* window = glfwCreateWindow(1200, 1600, "Texture Example", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(1200, 1600, "Texture Example", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -106,7 +215,8 @@ int main(int argc, char** argv) {
     // Load the texture
     int width = 32;
     int height = 32;
-    unsigned char* image = SOIL_load_image("/home/sina/code/opengl3_labs/Character197.png", &width, &height, 0, SOIL_LOAD_RGBA);
+    unsigned char *image = SOIL_load_image("/home/sina/code/opengl3_labs/Character197.png", &width, &height, 0,
+                                           SOIL_LOAD_RGBA);
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -117,8 +227,8 @@ int main(int argc, char** argv) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
     imgui_init(window);
@@ -127,23 +237,9 @@ int main(int argc, char** argv) {
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
-//        ImGui_ImplSDL2_ProcessEvent(&event);
-//        ImGui_ImplOpenGL3
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-        // Start the Dear ImGui frame
-        imgui_new_frame();
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
-        // Rendering
-        ImGui::Render();
-
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 //        lab2();
         lab3();
