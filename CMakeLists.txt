@@ -15,8 +15,10 @@ add_library(imguilib STATIC
         ${CMAKE_SOURCE_DIR}/imgui/imgui_draw.cpp
         ${CMAKE_SOURCE_DIR}/imgui/imgui_widgets.cpp
         ${CMAKE_SOURCE_DIR}/imgui/imgui_tables.cpp
+        ${CMAKE_SOURCE_DIR}/imgui/imgui_demo.cpp
         ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_opengl3.h
         ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_opengl3.cpp
+        ${CMAKE_SOURCE_DIR}/imgui/backends/imgui_impl_glfw.cpp
         )
 
 find_package(OpenGL REQUIRED)

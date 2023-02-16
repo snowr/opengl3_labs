@@ -42,6 +42,25 @@ void lab2() {
     glFlush();
 }
 
+void lab3() {
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 1.0f);
+//        glVertex3f(-1.0f,-1.0f, 1.0f);
+    glVertex3f(-.5f,-.5f, 1.0f);
+
+    glTexCoord2f(1.0f, 1.0f);
+//    glTexCoord2f(0.5, 0.5f);
+    glVertex3f( .5f,-.5f, 1.0f);
+
+//    glTexCoord2f(1.0f, 0.0f);
+    glTexCoord2f(1.0f, 0.5f);
+    glVertex3f( .5f, .5f, 1.0f);
+
+//    glTexCoord2f(0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.5f);
+    glVertex3f(-.5f, .5f, 1.0f);
+    glEnd();
+}
 
 
 void lab99() {
@@ -50,7 +69,7 @@ void lab99() {
 //        glVertex3f(-1.0f,-1.0f, 1.0f);
     glVertex3f(-.5f,-.5f, 1.0f);
 
-    glTexCoord2f(1.0f, 1.0f);
+    glTexCoord2f(1.f, 1.f);
     glVertex3f( .5f,-.5f, 1.0f);
 
     glTexCoord2f(1.0f, 0.0f);
@@ -87,7 +106,7 @@ int main(int argc, char** argv) {
     // Load the texture
     int width = 32;
     int height = 32;
-    unsigned char* image = SOIL_load_image("/home/sina/code/opengl3_labs/s01.png", &width, &height, 0, SOIL_LOAD_RGBA);
+    unsigned char* image = SOIL_load_image("/home/sina/code/opengl3_labs/Character197.png", &width, &height, 0, SOIL_LOAD_RGBA);
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -101,19 +120,43 @@ int main(int argc, char** argv) {
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+
+    imgui_init(window);
+    bool show_demo_window = true;
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
     // Main loop
     while (!glfwWindowShouldClose(window)) {
+//        ImGui_ImplSDL2_ProcessEvent(&event);
+//        ImGui_ImplOpenGL3
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+        // Start the Dear ImGui frame
+        imgui_new_frame();
+
+        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+        if (show_demo_window)
+            ImGui::ShowDemoWindow(&show_demo_window);
+        // Rendering
+        ImGui::Render();
+
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 //        lab2();
-        lab99();
+        lab3();
+//        lab99();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     // Clean up
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui::DestroyContext();
+
     SOIL_free_image_data(image);
     glfwDestroyWindow(window);
     glfwTerminate();

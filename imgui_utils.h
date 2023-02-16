@@ -6,9 +6,10 @@
 #define OPENGL3_LABS_IMGUI_UTILS_H
 
 #include <imgui_impl_opengl3.h>
+#include <imgui_impl_glfw.h>
 #include <imgui_internal.h>
 
-void imgui_init()
+void imgui_init(GLFWwindow* window)
 {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -21,12 +22,16 @@ void imgui_init()
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
 
-    ImGui_ImplOpenGL3_Init();
+    // GL 3.0 + GLSL 130
+    const char* glsl_version = "#version 130";
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
 void imgui_new_frame(){
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 }
 
