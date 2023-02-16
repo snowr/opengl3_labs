@@ -10,8 +10,18 @@
 
 #include "imgui_utils.h"
 
-class TextureCoordsUi {
+struct Vertex3 {
+    float x;
+    float y;
+    float z;
+} typedef Vertex3;
+
+class TextureCoordsExample {
 public:
+    TextureCoordsExample() {
+        default_vals();
+    }
+
     float d_t_bottom_left_s = 0.0f;
     float d_t_bottom_left_t = 1.0f;
 
@@ -35,6 +45,11 @@ public:
 
     float curr_t_top_right_s = d_t_top_right_s;
     float curr_t_top_right_t = d_t_top_right_t;
+
+    Vertex3 vertex_a;
+    Vertex3 vertex_b;
+    Vertex3 vertex_c;
+    Vertex3 vertex_d;
     
     void default_vals() {
         curr_t_bottom_left_s = d_t_bottom_left_s;
@@ -48,6 +63,25 @@ public:
 
         curr_t_top_right_s = d_t_top_right_s;
         curr_t_top_right_t = d_t_top_right_t;
+
+        vertex_a = {.x = -.5f, .y = -.5f, .z = 1.0f};
+        vertex_b = {.x = .5f, .y = -.5f, .z = 1.0f};
+        vertex_c = {.x = .5f, .y = .5f, .z = 1.0f};
+        vertex_d = {.x = -.5f, .y = .5f, .z = 1.0f};
+    }
+
+    void full_texture() {
+        curr_t_bottom_left_s = 0.0f;
+        curr_t_bottom_left_t = 1.0f;
+
+        curr_t_bottom_right_s = 1.0f;
+        curr_t_bottom_right_t = 1.0f;
+
+        curr_t_top_left_s = 1.0f;
+        curr_t_top_left_t = 0.0f;
+
+        curr_t_top_right_s = 0.0f;
+        curr_t_top_right_t = 0.0f;
     }
 };
 
@@ -83,35 +117,10 @@ void lab2() {
     glFlush();
 }
 
-void lab3(TextureCoordsUi* ui_state) {
+void lab3(TextureCoordsExample* ui_state) {
     // Start the Dear ImGui frame
     imgui_new_frame();
     bool show_demo_window = true;
-
-//    float d_t_bottom_left_s = 0.0f;
-//    float d_t_bottom_left_t = 1.0f;
-//
-//    float d_t_bottom_right_s = 1.0f;
-//    float d_t_bottom_right_t = 1.0f;
-//
-//    float d_t_top_left_s = 1.0f;
-//    float d_t_top_left_t = 0.5f;
-//
-//    float d_t_top_right_s = 0.0f;
-//    float d_t_top_right_t = 0.5f;
-
-//    float curr_t_bottom_left_s = d_t_bottom_left_s;
-//    float curr_t_bottom_left_t = d_t_bottom_left_t;
-//
-//    float curr_t_bottom_right_s = d_t_bottom_right_s;
-//    float curr_t_bottom_right_t = d_t_bottom_right_t;
-//
-//    float curr_t_top_left_s = d_t_top_left_s;
-//    float curr_t_top_left_t = d_t_top_left_t;
-//
-//    float curr_t_top_right_s = d_t_top_right_s;
-//    float curr_t_top_right_t = d_t_top_right_t;
-
 
     static bool no_menu = false;
     ImGuiWindowFlags window_flags = 0;
@@ -187,14 +196,18 @@ void lab3(TextureCoordsUi* ui_state) {
         ui_state->curr_t_top_right_s = atof(t_top_right_s);
         ui_state->curr_t_top_right_t = atof(t_top_right_t);
 
-
         bool reset = false;
         reset |= ImGui::Button("Reset");
         if (reset)
         {
             ui_state->default_vals();
-            std::cout << "hello " << ui_state->curr_t_bottom_left_s << std::endl;
+        }
 
+        bool load_full = false;
+        load_full |= ImGui::Button("Load Full Texture");
+        if (load_full)
+        {
+            ui_state->full_texture();
         }
     }
 
@@ -209,16 +222,16 @@ void lab3(TextureCoordsUi* ui_state) {
     glBegin(GL_QUADS);
 //    glTexCoord2f(0.0f, 1.0f);
     glTexCoord2f(ui_state->curr_t_bottom_left_s, ui_state->curr_t_bottom_left_t);
-    glVertex3f(-.5f, -.5f, 1.0f);
+    glVertex3f(ui_state->vertex_a.x, ui_state->vertex_a.y, ui_state->vertex_a.z);
 
     glTexCoord2f(ui_state->curr_t_bottom_right_s, ui_state->curr_t_bottom_right_t);
-    glVertex3f(.5f, -.5f, 1.0f);
+    glVertex3f(ui_state->vertex_b.x, ui_state->vertex_b.y, ui_state->vertex_b.z);
 
     glTexCoord2f(ui_state->curr_t_top_left_s, ui_state->curr_t_top_left_t);
-    glVertex3f(.5f, .5f, 1.0f);
+    glVertex3f(ui_state->vertex_c.x, ui_state->vertex_c.y, ui_state->vertex_c.z);
 
     glTexCoord2f(ui_state->curr_t_top_right_s, ui_state->curr_t_top_right_t);
-    glVertex3f(-.5f, .5f, 1.0f);
+    glVertex3f(ui_state->vertex_d.x, ui_state->vertex_d.y, ui_state->vertex_d.z);
     glEnd();
 }
 
@@ -276,7 +289,7 @@ int main(int argc, char** argv) {
 //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -286,7 +299,7 @@ int main(int argc, char** argv) {
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    TextureCoordsUi ui_state;
+    TextureCoordsExample ui_state;
     ui_state.d_t_bottom_left_s = 0.0f;
     ui_state.d_t_bottom_left_t = 1.0f;
 
