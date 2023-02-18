@@ -117,161 +117,7 @@ void lab2() {
     glFlush();
 }
 
-void lab3(TextureCoordsExample* ui_state) {
-    // Start the Dear ImGui frame
-    imgui_new_frame();
-    bool show_demo_window = true;
-
-    static bool no_menu = false;
-    ImGuiWindowFlags window_flags = 0;
-    if (!no_menu) window_flags |= ImGuiWindowFlags_MenuBar;
-
-    // Main body of the Demo window starts here.
-    if (!ImGui::Begin("Texture Coordinates Control", &show_demo_window, window_flags)) {
-        // Early out if the window is collapsed, as an optimization.
-        ImGui::End();
-        std::cout << "Imgui::End()" << std::endl;
-        return;
-    }
-
-    ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
-    // Menu Bar
-    if (ImGui::BeginMenuBar()) {
-        if (ImGui::BeginMenu("Menu")) {
-            ImGui::EndMenu();
-        }
-
-        ImGui::EndMenuBar();
-    }
-
-    ImGui::Spacing();
-    if (ImGui::CollapsingHeader("Texture Coordinates")) {
-        ImGui::Text("Values (s,t):");
-        char t_bot_left_s[64] = "";
-        sprintf(t_bot_left_s, "%.2f", ui_state->curr_t_bottom_left_s);
-        ImGui::InputText("bottom left s", t_bot_left_s, 64, ImGuiInputTextFlags_CharsDecimal);
-
-        static char t_bot_left_t[64] = "";
-        sprintf(t_bot_left_t, "%.2f", ui_state->curr_t_bottom_left_t);
-        ImGui::InputText("bottom left t", t_bot_left_t, 64, ImGuiInputTextFlags_CharsDecimal);
-
-        ImGui::Spacing();
-
-        static char t_bot_right_s[64] = "";
-        sprintf(t_bot_right_s, "%.2f", ui_state->curr_t_bottom_right_s);
-        ImGui::InputText("bottom right s", t_bot_right_s, 64, ImGuiInputTextFlags_CharsDecimal);
-
-        static char t_bot_right_t[64] = "";
-        sprintf(t_bot_right_t, "%.2f", ui_state->curr_t_bottom_right_t);
-        ImGui::InputText("bottom right t", t_bot_right_t, 64, ImGuiInputTextFlags_CharsDecimal);
-
-        ImGui::Spacing();
-
-        static char t_top_left_s[64] = "";
-        sprintf(t_top_left_s, "%.2f", ui_state->curr_t_top_left_s);
-        ImGui::InputText("top left s", t_top_left_s, 64, ImGuiInputTextFlags_CharsDecimal);
-
-        static char t_top_left_t[64] = "";
-        sprintf(t_top_left_t, "%.2f", ui_state->curr_t_top_left_t);
-        ImGui::InputText("top left t", t_top_left_t, 64, ImGuiInputTextFlags_CharsDecimal);
-
-        ImGui::Spacing();
-        static char t_top_right_s[64] = "";
-        sprintf(t_top_right_s, "%.2f", ui_state->curr_t_top_right_s);
-        ImGui::InputText("top right s", t_top_right_s, 64, ImGuiInputTextFlags_CharsDecimal);
-
-        static char t_top_right_t[64] = "";
-        sprintf(t_top_right_t, "%.2f", ui_state->curr_t_top_right_t);
-        ImGui::InputText("top right t", t_top_right_t, 64, ImGuiInputTextFlags_CharsDecimal);
-
-        ui_state->curr_t_bottom_left_s = atof(t_bot_left_s);
-        ui_state->curr_t_bottom_left_t = atof(t_bot_left_t);
-
-        ui_state->curr_t_bottom_right_s = atof(t_bot_right_s);
-        ui_state->curr_t_bottom_right_t = atof(t_bot_right_t);
-
-        ui_state->curr_t_top_left_s = atof(t_top_left_s);
-        ui_state->curr_t_top_left_t = atof(t_top_left_t);
-
-        ui_state->curr_t_top_right_s = atof(t_top_right_s);
-        ui_state->curr_t_top_right_t = atof(t_top_right_t);
-
-        bool reset = false;
-        reset |= ImGui::Button("Reset");
-        if (reset)
-        {
-            ui_state->default_vals();
-        }
-
-        bool load_full = false;
-        load_full |= ImGui::Button("Load Full Texture");
-        if (load_full)
-        {
-            ui_state->full_texture();
-        }
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::End();
-    // Rendering
-    ImGui::Render();
-
-//    glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    glBegin(GL_QUADS);
-//    glTexCoord2f(0.0f, 1.0f);
-    glTexCoord2f(ui_state->curr_t_bottom_left_s, ui_state->curr_t_bottom_left_t);
-    glVertex3f(ui_state->vertex_a.x, ui_state->vertex_a.y, ui_state->vertex_a.z);
-
-    glTexCoord2f(ui_state->curr_t_bottom_right_s, ui_state->curr_t_bottom_right_t);
-    glVertex3f(ui_state->vertex_b.x, ui_state->vertex_b.y, ui_state->vertex_b.z);
-
-    glTexCoord2f(ui_state->curr_t_top_left_s, ui_state->curr_t_top_left_t);
-    glVertex3f(ui_state->vertex_c.x, ui_state->vertex_c.y, ui_state->vertex_c.z);
-
-    glTexCoord2f(ui_state->curr_t_top_right_s, ui_state->curr_t_top_right_t);
-    glVertex3f(ui_state->vertex_d.x, ui_state->vertex_d.y, ui_state->vertex_d.z);
-    glEnd();
-}
-
-
-void lab99() {
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f);
-//        glVertex3f(-1.0f,-1.0f, 1.0f);
-    glVertex3f(-.5f,-.5f, 1.0f);
-
-    glTexCoord2f(1.f, 1.f);
-    glVertex3f( .5f,-.5f, 1.0f);
-
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f( .5f, .5f, 1.0f);
-
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(-.5f, .5f, 1.0f);
-    glEnd();
-}
-
-int main(int argc, char** argv) {
-    // Initialize GLFW
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
-    }
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-    // Create a window and OpenGL context
-    GLFWwindow *window = glfwCreateWindow(1200, 1600, "Texture Example", nullptr, nullptr);
-    if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-
+void lab3(GLFWwindow* window) {
 
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -317,21 +163,172 @@ int main(int argc, char** argv) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+// Start the Dear ImGui frame
+        imgui_new_frame();
+        bool show_demo_window = true;
 
-//        lab2();
+        static bool no_menu = false;
+        ImGuiWindowFlags window_flags = 0;
+        if (!no_menu) window_flags |= ImGuiWindowFlags_MenuBar;
 
-        lab3(&ui_state);
-//        lab99();
+        // Main body of the Demo window starts here.
+        if (!ImGui::Begin("Texture Coordinates Control", &show_demo_window, window_flags)) {
+            // Early out if the window is collapsed, as an optimization.
+            ImGui::End();
+            std::cout << "Imgui::End()" << std::endl;
+            return;
+        }
+
+        ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
+        // Menu Bar
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("Menu")) {
+                ImGui::EndMenu();
+            }
+
+            ImGui::EndMenuBar();
+        }
+
+        ImGui::Spacing();
+        if (ImGui::CollapsingHeader("Texture Coordinates")) {
+            ImGui::Text("Values (s,t):");
+            char t_bot_left_s[64] = "";
+            sprintf(t_bot_left_s, "%.2f", ui_state.curr_t_bottom_left_s);
+            ImGui::InputText("bottom left s", t_bot_left_s, 64, ImGuiInputTextFlags_CharsDecimal);
+
+            static char t_bot_left_t[64] = "";
+            sprintf(t_bot_left_t, "%.2f", ui_state.curr_t_bottom_left_t);
+            ImGui::InputText("bottom left t", t_bot_left_t, 64, ImGuiInputTextFlags_CharsDecimal);
+
+            ImGui::Spacing();
+
+            static char t_bot_right_s[64] = "";
+            sprintf(t_bot_right_s, "%.2f", ui_state.curr_t_bottom_right_s);
+            ImGui::InputText("bottom right s", t_bot_right_s, 64, ImGuiInputTextFlags_CharsDecimal);
+
+            static char t_bot_right_t[64] = "";
+            sprintf(t_bot_right_t, "%.2f", ui_state.curr_t_bottom_right_t);
+            ImGui::InputText("bottom right t", t_bot_right_t, 64, ImGuiInputTextFlags_CharsDecimal);
+
+            ImGui::Spacing();
+
+            static char t_top_left_s[64] = "";
+            sprintf(t_top_left_s, "%.2f", ui_state.curr_t_top_left_s);
+            ImGui::InputText("top left s", t_top_left_s, 64, ImGuiInputTextFlags_CharsDecimal);
+
+            static char t_top_left_t[64] = "";
+            sprintf(t_top_left_t, "%.2f", ui_state.curr_t_top_left_t);
+            ImGui::InputText("top left t", t_top_left_t, 64, ImGuiInputTextFlags_CharsDecimal);
+
+            ImGui::Spacing();
+            static char t_top_right_s[64] = "";
+            sprintf(t_top_right_s, "%.2f", ui_state.curr_t_top_right_s);
+            ImGui::InputText("top right s", t_top_right_s, 64, ImGuiInputTextFlags_CharsDecimal);
+
+            static char t_top_right_t[64] = "";
+            sprintf(t_top_right_t, "%.2f", ui_state.curr_t_top_right_t);
+            ImGui::InputText("top right t", t_top_right_t, 64, ImGuiInputTextFlags_CharsDecimal);
+
+            ui_state.curr_t_bottom_left_s = atof(t_bot_left_s);
+            ui_state.curr_t_bottom_left_t = atof(t_bot_left_t);
+
+            ui_state.curr_t_bottom_right_s = atof(t_bot_right_s);
+            ui_state.curr_t_bottom_right_t = atof(t_bot_right_t);
+
+            ui_state.curr_t_top_left_s = atof(t_top_left_s);
+            ui_state.curr_t_top_left_t = atof(t_top_left_t);
+
+            ui_state.curr_t_top_right_s = atof(t_top_right_s);
+            ui_state.curr_t_top_right_t = atof(t_top_right_t);
+
+            bool reset = false;
+            reset |= ImGui::Button("Reset");
+            if (reset)
+            {
+                ui_state.default_vals();
+            }
+
+            bool load_full = false;
+            load_full |= ImGui::Button("Load Full Texture");
+            if (load_full)
+            {
+                ui_state.full_texture();
+            }
+        }
+
+        ImGui::PopItemWidth();
+        ImGui::End();
+        // Rendering
+        ImGui::Render();
+
+//    glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        glBegin(GL_QUADS);
+//    glTexCoord2f(0.0f, 1.0f);
+        glTexCoord2f(ui_state.curr_t_bottom_left_s, ui_state.curr_t_bottom_left_t);
+        glVertex3f(ui_state.vertex_a.x, ui_state.vertex_a.y, ui_state.vertex_a.z);
+
+        glTexCoord2f(ui_state.curr_t_bottom_right_s, ui_state.curr_t_bottom_right_t);
+        glVertex3f(ui_state.vertex_b.x, ui_state.vertex_b.y, ui_state.vertex_b.z);
+
+        glTexCoord2f(ui_state.curr_t_top_left_s, ui_state.curr_t_top_left_t);
+        glVertex3f(ui_state.vertex_c.x, ui_state.vertex_c.y, ui_state.vertex_c.z);
+
+        glTexCoord2f(ui_state.curr_t_top_right_s, ui_state.curr_t_top_right_t);
+        glVertex3f(ui_state.vertex_d.x, ui_state.vertex_d.y, ui_state.vertex_d.z);
+        glEnd();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
+    SOIL_free_image_data(image);
+}
+
+
+void lab99() {
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 1.0f);
+//        glVertex3f(-1.0f,-1.0f, 1.0f);
+    glVertex3f(-.5f,-.5f, 1.0f);
+
+    glTexCoord2f(1.f, 1.f);
+    glVertex3f( .5f,-.5f, 1.0f);
+
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f( .5f, .5f, 1.0f);
+
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-.5f, .5f, 1.0f);
+    glEnd();
+}
+
+int main(int argc, char** argv) {
+    // Initialize GLFW
+    if (!glfwInit()) {
+        std::cerr << "Failed to initialize GLFW" << std::endl;
+        return -1;
+    }
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+    // Create a window and OpenGL context
+    GLFWwindow *window = glfwCreateWindow(1200, 1600, "Texture Example", nullptr, nullptr);
+    if (!window) {
+        std::cerr << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+
+    lab3(window);
+
     // Clean up
     ImGui_ImplOpenGL3_Shutdown();
     ImGui::DestroyContext();
 
-    SOIL_free_image_data(image);
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
