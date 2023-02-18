@@ -286,33 +286,143 @@ void lab3(GLFWwindow* window) {
     SOIL_free_image_data(image);
 }
 
+void lab4(GLFWwindow* window)
+{
+    /////////// VERTEX INPUT
+    float vertices[] = {
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.0f, 0.5f, 0.0f,
 
-void lab99() {
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 1.0f);
-//        glVertex3f(-1.0f,-1.0f, 1.0f);
-    glVertex3f(-.5f,-.5f, 1.0f);
+    };
+    /////////// VERTEX SHADER
+    const char* vertex_shader_source = "#version 330 core\n"
+                                     "layout (location = 0) in vec3 aPos;\n"
+                                     "void main()\n"
+                                     "{\n"
+                                     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                     "}\0";
+    GLuint vertex_shader;
+    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex_shader, 1, &vertex_shader_source, nullptr);
+    glCompileShader(vertex_shader);
+    int vertex_shader_compile_success;
+    char vs_info_log[512];
+    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &vertex_shader_compile_success);
+    if(!vertex_shader_compile_success) {
+        glGetShaderInfoLog(vertex_shader, 512, nullptr, vs_info_log);
+        std::cout << "Failed to compile vertex shader";
+        throw std::runtime_error(vs_info_log);
+    }
 
-    glTexCoord2f(1.f, 1.f);
-    glVertex3f( .5f,-.5f, 1.0f);
+    /////////// FRAGMENT SHADER
+    GLuint fragment_shader;
+    const char* fragment_shader_source =
+            "#version 400\n"
+            "out vec4 frag_colour;"
+            "void main() {"
+            "  frag_colour = vec4(0.0, 1.0, 0.0, 1.0);"
+            "}";
+    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment_shader, 1, &fragment_shader_source, nullptr);
+    glCompileShader(fragment_shader);
+    int fragment_shader_compile_success;
+    char fs_info_log[512];
+    glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &fragment_shader_compile_success);
+    if(!fragment_shader_compile_success) {
+        glGetShaderInfoLog(fragment_shader, 512, nullptr, fs_info_log);
+        std::cout << "Failed to compile fragment shader";
+        throw std::runtime_error(fs_info_log);
+    }
 
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex3f( .5f, .5f, 1.0f);
+    /////////// SHADER PROGRAM
+    GLuint shader_program;
+    shader_program = glCreateProgram();
+    glAttachShader(shader_program, vertex_shader);
+    glAttachShader(shader_program, fragment_shader);
+    glLinkProgram(shader_program);
+    int shader_program_link_success;
+    char sp_info_log[512];
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &shader_program_link_success);
+    if(!shader_program_link_success) {
+        glGetProgramInfoLog(shader_program, 512, nullptr, sp_info_log);
+        std::cout << "Failed to link shader program";
+        throw std::runtime_error(sp_info_log);
+    }
+    // no longer required post linking
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
 
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex3f(-.5f, .5f, 1.0f);
-    glEnd();
+    /////////// LINKING VERTEX ATTRIBUTES
+    GLuint vbo;
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindVertexArray(vao);
+//    GL_STREAM_DRAW: the data is set only once and used by the GPU at most a few times.
+//    GL_STATIC_DRAW: the data is set only once and used many times.
+//    GL_DYNAMIC_DRAW: the data is changed a lot and used many times.
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    //      VERTEX 1        |       VERTEX 2        |       VERTEX 3        |
+    //  X   |   Y   |   Z   |   X   |   Y   |   Z   |   X   |   Y   |   Z   |
+    //0     4       8       12      16      20      24      28      33      36
+    // ---------------------> STRIDE: (3 * sizeof(float)) = 12
+    // OFFSET: 0
+    // The position data is stored as 32-bit (4 byte) floating point values
+    // Each position is composed of 3 floats (xyz)
+    // There is no space or other values between each set of 3 values. They are tightly
+    // packed in the array. If for example we had color values (rgb) then there would be some
+    // space between the values.
+
+    // 1. Specifies which vertex attribute we want to configure. Remember in the vertex
+    // shader source code we specified `layout (location = 0)`. This sets the location
+    // of the vertex attribute to 0.
+    // 2. Size of the vertex attribute. It's a vec3, so it's composed of 3 values.
+    // 3. Type of data (vec* in GLSL consists of floating point values).
+    // 4. Specifies if we want the data to be normalized. Not relevant for this example.
+    // 5. Stride - See above diagram. Since this is tightly packed we could have set it to 0.
+    // 6. Offset - 0; Not relevant for this example.
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+
+    // Each vertex attribute takes data from memory-managed VBO.
+    // Which VBO data is taken from is determined by the VBO currently
+    // bound to GL_ARRAY_BUFFER when calling `glVertexAttribPointer`.
+    // We previously defined the VBO above thus it's bound at this point.
+    glEnableVertexAttribArray(0);
+
+
+    // Main loop
+    while (!glfwWindowShouldClose(window)) {
+        // render
+        // ------
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shader_program);
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteProgram(shader_program);
 }
 
 int main(int argc, char** argv) {
+    bool cleanup_imgui = false;
     // Initialize GLFW
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         return -1;
     }
-
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create a window and OpenGL context
     GLFWwindow *window = glfwCreateWindow(1200, 1600, "Texture Example", nullptr, nullptr);
@@ -322,12 +432,19 @@ int main(int argc, char** argv) {
         return -1;
     }
     glfwMakeContextCurrent(window);
+    // start GLEW extension handler
+    glewExperimental = GL_TRUE;
+    glewInit();
 
-    lab3(window);
+//    lab3(window); cleanup_imgui = true;
+    lab4(window);
+//    lab5(window);
 
-    // Clean up
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui::DestroyContext();
+    if(cleanup_imgui) {
+        // Clean up
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui::DestroyContext();
+    }
 
     glfwDestroyWindow(window);
     glfwTerminate();
